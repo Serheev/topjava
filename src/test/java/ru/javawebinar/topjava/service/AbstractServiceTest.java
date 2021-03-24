@@ -1,10 +1,15 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -30,6 +35,22 @@ abstract public class AbstractServiceTest {
 
     @Rule
     public Stopwatch stopwatch = TimingRules.STOPWATCH;
+
+    @Autowired
+    protected Environment env;
+
+    @Rule
+    public TestName testName = new TestName();
+
+    @Before()
+    public void checkProfile() throws Exception {
+        Assume.assumeFalse(isJDBCProfile() && testName.getMethodName().equals("createWithException"));
+    }
+
+    protected boolean isJDBCProfile() {
+        String[] activeProfiles = env.getActiveProfiles();
+        return activeProfiles[1].toLowerCase().contains("jdbc");
+    }
 
     //  Check root cause in JUnit: https://github.com/junit-team/junit4/pull/778
     public <T extends Throwable> void validateRootCause(Class<T> rootExceptionClass, Runnable runnable) {
