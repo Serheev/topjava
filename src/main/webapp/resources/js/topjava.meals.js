@@ -1,9 +1,21 @@
-const userAjaxUrl = "profile/meals/";
+const mealAjaxUrl = "profile/meals/";
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
-    ajaxUrl: userAjaxUrl
-};
+    ajaxUrl: mealAjaxUrl,
+    updateTable: function () {
+        $.ajax({
+            type: "GET",
+            url: "profile/meals/filter",
+            data: $("#filter").serialize()
+        }).done(updateTableByData);
+    }
+}
+
+function clearFilter() {
+    $("#filter")[0].reset();
+    $.get("profile/meals/", updateTableByData);
+}
 
 // $(document).ready(function () {
 $(function () {
